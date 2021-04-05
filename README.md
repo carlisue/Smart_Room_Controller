@@ -1,7 +1,7 @@
 # Smart_Room_Controller
-## Midterm IoT Project
-## Carli Stringfellow
-## 04-05-2021
+### Midterm IoT Project
+### Carli Stringfellow
+### 04-05-2021
 
 ## Overview
 1. Controls lights
@@ -9,10 +9,10 @@
 3. *does something*
 4. *does something*
 
-## Specifics
+### Specifics
 *
 
-## Componenets 
+### Componenets 
 
 ### Summary 
 

@@ -61,8 +61,8 @@ bool manualFan;
 // encoder declarations 
  OneButton encoderButton(20, true, true); 
  Encoder myEnc(22,23);
- bool encoderButtonState; 
- bool firstRelax;
+ bool encoderButtonState = true;
+ bool firstRelax = true;
  const int REDLED = 16;
  const int GREENLED = 17;
  int position;
@@ -172,7 +172,7 @@ void yellowClick() { // toggles fan
   
 //  Serial.printf("yellowButtonState = %i", yellowButtonState);
 }
-void encoderClick() { // turns everything off
+void encoderClick() { // turns hues off
   encoderButtonState = !encoderButtonState;
   Serial.printf("encoderButtonState = %i\n", encoderButtonState);
 
@@ -198,10 +198,9 @@ void defaultMode() { //this is work mode as the most time is spent here
   display.printf("You are in WORK MODE");
   display.display();
 
-  manualFan = false; //sets manual use of fan to false
-    if(manualFan = false); {
-    if(tempF >= 75){
-    yellowButtonState;
+    if(manualFan == false) {
+      if(tempF >= 75){
+      yellowClick();
     }
   }
 
@@ -222,14 +221,20 @@ void defaultMode() { //this is work mode as the most time is spent here
   currentTime = millis();
     if((currentTime-lastSecond) > 1000) {
       for(b=1; b<=5; b++) {
-        if(encoderButtonState == false) {
+        if(encoderButtonState == true) {
           digitalWrite(REDLED,LOW);
           digitalWrite(GREENLED,HIGH);
           setHue(b, true, HueWork[b-1], HueBri*20, 190);
-          lastSecond = millis(); 
+          }
+        else {
+          digitalWrite(REDLED,HIGH);
+          digitalWrite(GREENLED,LOW);
+          setHue(b, false, HueWork[b-1], 0, 0);
         }
       }
+        lastSecond = millis();
     }
+       
     if(timerON) {
     if((millis() - startTimer) > sittingTime) {
       if(inches <= sittingDistance) {
@@ -255,7 +260,7 @@ void breakMode() { // automatic mode triggered by ultrasonic wave in inches
   display.display();
 
   if(firstRelax) { // Flashes hue lights for first relax
-   for(int i = 0; i >= 2; i++) {
+   for(int i = 0; i >= 3; i++) {
     setHue(b, false, HueRelax[b-1], 0, 0);
     delay(1000);
     setHue(b, true, HueRelax[b-1], 255, 255);
@@ -270,6 +275,7 @@ void breakMode() { // automatic mode triggered by ultrasonic wave in inches
 
 void resetToDefault() { // Uses longpress on the encoder to reset to default mode
   defaultMode();
+  manualFan = false;
   timerON = true;
   firstRelax = true;
   startTimer = millis();

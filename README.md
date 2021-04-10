@@ -13,25 +13,26 @@ movement of the body as this is very beneficial for efficent work.
 
 ### **Specifics**
 1. **Controls Hue Lights**
-* *The defaultMode sets a work tone with blue, green, and indigo colors*
-* *The breakMode sets a relaxing tone with orange, red, and yellow colors*
-* *The encoder allows one to control the brightness of the defaultMode lighting* 
+  * *The defaultMode sets a work tone with blue, green, and indigo colors*
+  * *The breakMode sets a relaxing tone with orange, red, and yellow colors*
+  * *The encoder allows one to control the brightness of the defaultMode lighting* 
   *and toggles the hue lights on and off*
 
 2. **Reads BME Sensor Data**
-* *Tempurature and humidity are writen to OLED screen*
-* *Tempurature over 75 degrees will trigger fan to ON*
+  * *Tempurature and humidity are writen to OLED screen*
+  * *Tempurature over 75 degrees will trigger fan to ON*
 
 3. **Ultrasonic Sensor**
-* *Toggles defaultMode and breakMode by detecting distance in inches*
-* *Detects whether or not someone has been sitting at their desk for
+  * *Toggles defaultMode and breakMode by detecting distance in inches*
+  * *Detects whether or not someone has been sitting at their desk for
   *too long using a timer function.*
 
 4. **Buttons**
-* *Orange button toggles teapot wemo outlet*
-* *Yellow button toggles fan wemo outlet*
+  * *Orange button toggles teapot wemo outlet*
+  * *Yellow button toggles fan wemo outlet*
+
 5. **Neopixels**
-* *Cycle through different colors to mimic an alarm for breakMode*
+  * *Cycle through different colors to mimic an alarm for breakMode*
 
 ### **Components** 
 * Phillips Hue Lights

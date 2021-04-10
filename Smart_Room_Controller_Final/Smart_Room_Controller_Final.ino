@@ -16,49 +16,56 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_BME280.h>
+#include <Adafruit_NeoPixel.h>
+#include "colors.h"
 
-int currentTime;
-int lastSecond;
+//Pixel declarations
+ const int PIXELPIN = 21;
+ const int PIXELCOUNT = 12;
+ int r;
+ int p;
+ Adafruit_NeoPixel pixel(PIXELCOUNT, PIXELPIN, NEO_GRB + NEO_KHZ800);
+ int currentTime;
+ int lastSecond;
+ 
+ //Ultrasonic declarations
+ const int echoPin = 7; 
+ const int trigPin = 6;
+ unsigned long duration; // variable for the duration of sound wave travel
+ int distance; // variable for the distance measurement
+ int lastDistance;
+ int dist_cm;
+ float inches;
+ 
+ //Bme declarations
+ const int chipSelect = 4;
+ float tempF;
+ float humidRH; 
+ Adafruit_BME280 bme;
+ char D = 248;
+ 
+ //oled declarations
+ const int SCREEN_WIDTH = 128; // OLED display width, in pixels
+ const int SCREEN_HEIGHT = 64; // OLED display height, in pixels
+ const int SCREEN_ADDRESS = 0x3C; 
+ char N = 164;
+ const int OLED_RESET = 4; 
+ int rot = 0;
+ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+ EthernetClient client;
+ bool status;
+  
+ // Orange and yellow button declarations
+ OneButton orangeButton (14, false);
+ OneButton yellowButton (15, false);
+ bool orangeButtonState;
+ bool yellowButtonState;
+ const int TEAPOT = 3;
+ const int FAN = 2;
+ float f = tempF;
+ bool manualFan;
 
-//ultrasonic declarations
-const int echoPin = 7; 
-const int trigPin = 6;
-unsigned long duration; // variable for the duration of sound wave travel
-int distance; // variable for the distance measurement
-int lastDistance;
-int dist_cm;
-float inches;
-
-//bme declarations
-const int chipSelect = 4;
-float tempF;
-float humidRH;
-
-Adafruit_BME280 bme;
-char D = 248;
-
-//oled declarations
-const int SCREEN_WIDTH = 128; // OLED display width, in pixels
-const int SCREEN_HEIGHT = 64; // OLED display height, in pixels
-const int SCREEN_ADDRESS = 0x3C; 
-char N = 164;
-const int OLED_RESET = 4; 
-int rot = 0;
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-EthernetClient client;
-bool status;
-
-// orange and yellow button declarations
-OneButton orangeButton (14, false);
-OneButton yellowButton (15, false);
-bool orangeButtonState;
-bool yellowButtonState;
-const int TEAPOT = 3;
-const int FAN = 2;
-float f = tempF;
-bool manualFan;
-
-// encoder declarations 
+// Encoder declarations 
  OneButton encoderButton(20, true, true); 
  Encoder myEnc(22,23);
  bool encoderButtonState = true;
@@ -72,6 +79,7 @@ bool manualFan;
  const int HUEMAX = 12;
  int HueBri;
  int b = 0;
+ // Hue lights arrays used in defaultMode and breakMode functions
  int HueWork[] = {HueBlue, HueGreen, HueBlue, HueIndigo, HueGreen};
  int HueRelax[] = {HueRed, HueYellow, HueOrange, HueRed, HueYellow};
 
@@ -82,6 +90,9 @@ bool manualFan;
  const int sittingTime = 10000;
  
 void setup() {
+  pixel.begin();
+  pixel.show();
+  pixel.setBrightness(20);
   Serial.begin(9600); //Turns on serial monitor
   bme.begin(0x76); // Turns on bme sensor
   pinMode(trigPin, OUTPUT); // Sets the trigPin as an OUTPUT
@@ -91,10 +102,10 @@ void setup() {
 
   
   // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
-  if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+    if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
     Serial.println(F("SSD1306 allocation failed"));
-    for(;;); // Don't proceed, loop forever
-  }
+      for(;;); // Don't proceed, loop forever
+    }
   // Show initial display buffer contents on the screen --
   // the library initializes this with an Adafruit splash screen.
   display.display();
@@ -142,26 +153,12 @@ void loop() {
   yellowButton.tick(); // checks fan buttonstate
  
   encoderButton.tick(); // encoder controls brightness and toggles hues on/off 
-//    if(!encoderButtonState) {
-//    setHue(b, false, HueWork[b-1], 0, 0); 
-//    }
-//    
-      defaultMode(); // calls work mode 
+   
+  defaultMode(); // Calls main function (the working mode)
 //    breakMode();
 
-    if(timerON) {
-    if((millis() - startTimer) > sittingTime) {
-      if(inches <= sittingDistance) {
-        breakMode();
-        Serial.printf("timer: \n", timerON);
-      }
-      timerON = false;
-    } 
-   
-  }
-
 }
-void orangeClick() {
+void orangeClick() { // Toggles teapot wemo
   orangeButtonState = !orangeButtonState;
     if(orangeButtonState) {
       switchON(TEAPOT);
@@ -172,7 +169,7 @@ void orangeClick() {
 //  Serial.printf("orangeButtonState = %i", orangeButtonState);
 }
 
-void yellowClick() { // toggles fan
+void yellowClick() { // Toggles fan wemo
   yellowButtonState = !yellowButtonState;
   manualFan = true;
        if(yellowButtonState) {
@@ -186,11 +183,11 @@ void yellowClick() { // toggles fan
 }
 void encoderClick() { // turns hues off
   encoderButtonState = !encoderButtonState;
-  Serial.printf("encoderButtonState = %i\n", encoderButtonState);
-
+//  Serial.printf("encoderButtonState = %i\n", encoderButtonState);
 }
 
 void defaultMode() { //this is work mode as the most time is spent here
+  pixel.clear();
   display.clearDisplay();
   display.setTextSize(1);             // Normal 1:1 pixel scale
   display.setTextColor(SSD1306_WHITE);        // Draw WHITE text
@@ -203,7 +200,7 @@ void defaultMode() { //this is work mode as the most time is spent here
   humidRH = bme.readHumidity(); // displays humidity
   display.printf("Humidity is %0.1f\n" ,humidRH);
 //  Serial.printf("Humidity is %0.1f\n" ,humidRH);
-
+  display.printf("Distance:\n%0.01f inches\n\n", inches);
   display.printf("\n");
   display.printf("\n");
 
@@ -213,8 +210,8 @@ void defaultMode() { //this is work mode as the most time is spent here
     if(manualFan == false) {
       if(tempF >= 75){
       yellowClick();
+      }
     }
-  }
 
   position = myEnc.read(); //sets parameter for encoder
   
@@ -245,17 +242,18 @@ void defaultMode() { //this is work mode as the most time is spent here
         }
       }
         lastSecond = millis();
+    }        
+    if(timerON) {
+    if((millis() - startTimer) > sittingTime) {
+      if(inches <= sittingDistance) {
+        breakMode();
+        timerON = false;
+        Serial.printf("timer: \n", timerON);
+      }
     }
-          
-//    if(timerON) {
-//    if((millis() - startTimer) > sittingTime) {
-//      if(inches <= sittingDistance) {
-//        breakMode();
-//        timerON = false;
-//        Serial.printf("timer: \n", timerON);
-//      }
-//    }
-//  }
+  }
+  pixel.show();
+  pixel.clear();
 }
 
 
@@ -277,19 +275,14 @@ void breakMode() { // automatic mode triggered by ultrasonic wave in inches
   for(b=1; b<=5; b++) {
     setHue(b, true, HueRelax[b-1], 255, 255);
   }
-
-//  if(firstRelax) { // Flashes hue lights for first relax
-//   for(int i = 0; i >= 3; i++) {
-//    setHue(b, false, HueRelax[b-1], 0, 0);
-//    delay(1000);
-//    setHue(b, true, HueRelax[b-1], 255, 255);
-//    delay(1000);
-//    setHue(b, false, HueRelax[b-1], 0, 0);
-//    delay(1000);
-//    setHue(b, true, HueRelax[b-1], 195, 255);
-//      firstRelax = false;
-//   }
-//  }
+  // flashes pixel ring in different colors to simulate an alarm
+   pixel.clear();
+    for(p=0;p<PIXELCOUNT;p++) {
+      r = random(0x000000, 0xFFFFFF);
+      pixel.fill(r,p,12);
+      pixel.show();
+    }
+   Serial.printf("Timer status:\n", timerON);
  }
 
 void resetToDefault() { // Uses longpress on the encoder to reset to default mode
@@ -298,6 +291,7 @@ void resetToDefault() { // Uses longpress on the encoder to reset to default mod
   timerON = true;
   firstRelax = true;
   startTimer = millis();
+  pixel.clear();
 }
 void ultraSonic() {
   //Sends ultrasonic pulse
@@ -318,6 +312,6 @@ void ultraSonic() {
   
   // Displays the distance on the Serial Monitor
  
-//    Serial.printf("Distance:\n\n%i mm\n%i cm\n%0.02f inches\n\n", distance, dist_cm, inches);
+    Serial.printf("Distance:\n%0.02f inches\n\n", inches);
     lastDistance = distance;
 }

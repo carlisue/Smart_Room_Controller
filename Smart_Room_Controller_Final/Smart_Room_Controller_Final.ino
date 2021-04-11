@@ -3,7 +3,7 @@
  * Description: Controls two modes: Default mode (working) and Break mode
  *              to encourge a worker to get up from desk and move their body.
  * Author:      Carli Stringfellow
- * Date:        04-09-2021
+ * Date:        04-12-2021
  */
  
 #include <OneButton.h>

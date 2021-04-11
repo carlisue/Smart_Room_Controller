@@ -46,5 +46,5 @@ movement of the body as this is very beneficial for efficent work.
 
 ### **Summary** 
 Check out my project on hackster.io: [hackster.io](https : //www.hackster.io/carlisue1)
-Check out my coding on GitHub: [GitHub](https : //github.com/carlisue)
+Check out my coding on GitHub: [GitHub](https : //www.github.com/carlisue)
 

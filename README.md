@@ -19,8 +19,8 @@ movement of the body as this is very beneficial for efficent work.
   *and toggles the hue lights on and off*
 
 2. **Reads BME Sensor Data**
-  * *Tempurature and humidity are writen to OLED screen*
-  * *Tempurature over 75 degrees will trigger fan to ON*
+  * *Temperature and humidity are writen to OLED screen*
+  * *Temperature over 75 degrees will trigger fan to ON*
 
 3. **Ultrasonic Sensor**
   * *Toggles defaultMode and breakMode by detecting distance in inches*
@@ -35,13 +35,16 @@ movement of the body as this is very beneficial for efficent work.
   * *Cycle through different colors to mimic an alarm for breakMode*
 
 ### **Components** 
-* Phillips Hue Lights
+* Philips Hue Lights
 * Adafruit Colorful Round Tactile Button Switch (2)
 * Ultrasonic SR-04
-* Teensy Board 3.2
+* Teensy Board 3.1
 * Standard USB Cable
 * OLED Display Module 12864 128x64 Pixel
-### **Summary** 
+* Adafruit BME Sensor
+* Ethernet
 
-*link here*
+### **Summary** 
+Check out my project on hackster.io: [hackster.io](https : //www.hackster.io/carlisue1)
+Check out my coding on GitHub: [GitHub](https : //github.com/carlisue)
 

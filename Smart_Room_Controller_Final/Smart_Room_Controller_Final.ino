@@ -88,6 +88,7 @@
  bool timerON = true;
  const int sittingDistance = 50;
  const int sittingTime = 10000;
+ bool takingBreak;
  
 void setup() {
   pixel.begin();
@@ -154,7 +155,9 @@ void loop() {
  
   encoderButton.tick(); // encoder controls brightness and toggles hues on/off 
    
+  if(!takingBreak) {
   defaultMode(); // Calls main function (the working mode)
+  }
 //    breakMode();
 
 }
@@ -258,6 +261,7 @@ void defaultMode() { //this is work mode as the most time is spent here
 
 
 void breakMode() { // automatic mode triggered by ultrasonic wave in inches
+  takingBreak = true;
   display.clearDisplay();
   display.setTextSize(1);             // Normal 1:1 pixel scale
   display.setTextColor(SSD1306_WHITE);        // Draw WHITE text
@@ -286,6 +290,7 @@ void breakMode() { // automatic mode triggered by ultrasonic wave in inches
  }
 
 void resetToDefault() { // Uses longpress on the encoder to reset to default mode
+  takingBreak = false; 
   defaultMode();
   manualFan = false;
   timerON = true;
